@@ -7,7 +7,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.testng.asserts.SoftAssert;
 import utils.CommonMethods;
 import utils.ConfigsReader;
 import utils.Constants;
@@ -15,28 +14,25 @@ import utils.excelUtility;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class LoginTest extends CommonMethods {
 
-    @Test(groups = "regression")
+    @Test(groups = "SmokeTest")
     public void validLogin() {
         sendText(login.userNametextBox, ConfigsReader.getPropValue("username"));
         sendText(login.passwordTextBox, ConfigsReader.getPropValue("password"));
         click(login.loginBtn);
-        Assert.assertTrue(dash.welcome.isDisplayed()); // ??
+        Assert.assertTrue(dash.welcome.isDisplayed());
     }
 
-    @Test(groups = "regression", dataProvider = "getData")
+    @Test(groups = "regression", dataProvider = "getData") // Negative Test
     public void invalidLogin(String username, String password, String errorMsg) {
         sendText(login.userNametextBox, username);
         sendText(login.passwordTextBox, password);
         click(login.loginBtn);
         System.out.println(login.spanMessage.getText());
-        ///Assert.assertTrue(login.spanMessage.isDisplayed());
         Assert.assertEquals(login.spanMessage.getText(), errorMsg);
     }
 
@@ -51,20 +47,24 @@ public class LoginTest extends CommonMethods {
     }
 
     @Test(groups = "add", dataProvider = "setData")
-    public void addLogin(String str1, String str2, String str3) {
+    public void addLogin(String firstName, String lastName, String str3) throws InterruptedException {
+        // Login
         sendText(login.userNametextBox, ConfigsReader.getPropValue("username"));
         sendText(login.passwordTextBox, ConfigsReader.getPropValue("password"));
         click(login.loginBtn);
-        addEmp.menu_pim_viewPimModule.click();
-        addEmp.menu_pim_addEmployee.click();
-        sendText(addEmp.firstName, str1);
-        sendText(addEmp.lastName, str2);
+        // PIM - addEmployee - fill out form - save
+        click(addEmp.menu_pim_viewPimModule);
+        click(addEmp.menu_pim_addEmployee);
+        sendText(addEmp.firstName, firstName);
+        sendText(addEmp.lastName, lastName);
         String emploID = driver.findElement(By.id("employeeId")).getAttribute("value");
         System.out.println(emploID);
         click(addEmp.chkLogin);
-        sendText(addEmp.user_name, str1 + "-" + str2);
+Thread.sleep(10000);
+        sendText(addEmp.user_name, firstName + "-" + lastName);
         sendText(addEmp.user_password, str3);
         sendText(addEmp.re_password, str3);
+        Thread.sleep(10000);
         click(addEmp.btnSave);
         //    Assert.assertEquals(addEmp.profilePic.getText(),str1+" "+str2);
         driver.findElement(By.id("menu_leave_viewLeaveModule")).click();
@@ -95,7 +95,7 @@ public class LoginTest extends CommonMethods {
     }
 
     @Test(groups = "hello")
-    public void addMultipleEmployee(){
+    public void addMultipleEmployee() {
         sendText(login.userNametextBox, ConfigsReader.getPropValue("username"));
         sendText(login.passwordTextBox, ConfigsReader.getPropValue("password"));
         click(login.loginBtn);
@@ -103,21 +103,19 @@ public class LoginTest extends CommonMethods {
         addEmp.menu_pim_viewPimModule.click();
         addEmp.menu_pim_addEmployee.click();
         System.out.println("merhabaaa");
-        List<Map<String,String>> empList=excelUtility.excelToListMap(Constants.TESTDATA_FILEPATH,"addEmp");
+        List<Map<String, String>> empList = excelUtility.excelToListMap(Constants.TESTDATA_FILEPATH, "addEmp");
 
-        for(Map<String,String> map:empList){
+        for (Map<String, String> map : empList) {
             addEmp.menu_pim_addEmployee.click();
             System.out.println("merhbaaa");
-            String firstName=map.get("FirstName");
-            String lastName=map.get("LastName");
+            String firstName = map.get("FirstName");
+            String lastName = map.get("LastName");
             System.out.println(firstName);
             System.out.println(lastName);
-            sendText(addEmp.firstName,"dawdawd");
+            sendText(addEmp.firstName, "dawdawd");
             sendText(addEmp.lastName, lastName);
             click(addEmp.btnSave);
         }
-
-
-
     }
+
 }
