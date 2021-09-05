@@ -12,11 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 public class BaseClass {
     public static WebDriver driver;
-
     @BeforeMethod(alwaysRun = true)
     public void setup(){
         ConfigsReader.readProperties(Constants.CONFIGURATION_FILEPATH);
-
         switch (ConfigsReader.getPropValue("browser")){
             case "chrome":
                 System.setProperty("webdriver.chrome.driver", Constants.CHROMEDRIVER_PATH);
@@ -34,7 +32,6 @@ public class BaseClass {
         driver.get(ConfigsReader.getPropValue("applicationUrl"));
     pageInitializer.initializePageObjects();
     }
-
     @AfterMethod(alwaysRun = true)
     public void close(){
         if(driver!=null){
